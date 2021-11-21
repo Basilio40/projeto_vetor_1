@@ -1,18 +1,27 @@
 import PyPDF2
 import tabula
+import re
 from PyPDF2.pdf import PdfFileReader, PdfFileWriter
 
 
-#=======================================LENDO DADOS DOS HOLERITES DOS FUNCIONARIOS===================================================
-class CarregarPDF:
+#=======================================LENDO DADOS DOS HOLERITES DOS FUNCIONARIOS===================================================     
+class CarregarPdf:
     def __init__(self):
-        self.holerite = r"C:\Users\Sandro Bispo\Desktop\Pythons_do_mes\projeto_vetor\Holerite\HOLERITES 10-2020.pdf"
+        pass
+    def carregaholerite(holerites):
+        holerites = PdfFileReader(open(r"C:\Users\Sandro Bispo\Desktop\Pythons_do_mes\projeto_vetor\Holerite\HOLERITES 10-2020.pdf",'rb'))
+        f = lambda x: re.sub(r'\/|\\', '', x)
+        for h in range(holerites.numPages):
+            saida = PdfFileWriter()
+            saida.addPage(holerites.getPage(h))
+            pagina = holerites.getPage(h)
+            conteudo = pagina.extractText()
+            if len(re.findall(r'(\d.{3,4})+[0-9]{2,3} - (\w.+)', conteudo)) == 1:
+                continue
+            find = re.findall(r'(\d.{3,4})+[0-9]{2,3} - (\w.+)', conteudo)[0][-1]
+            with open(f"saidaholerite/{f(find)}.pdf", "wb") as saidaStream:
+                saida.write(saidaStream)
 
-    def carregaholerite(self):
-        self.lerHolerite =  PyPDF2.PdfFileReader(self.holerite)
-        self.pagina = self.lerHolerite.getPage(0)
-        self.conteudo = self.pagina.extractText()
-        print(self.conteudo)
                       
 #========================================== LENDO E DIVIDINDO O CARTÃO DE POR FUNCIONARIO ====================================================
     def split_pdf(ponto):
@@ -29,8 +38,7 @@ class CarregarPDF:
                 
         
     
-  
-carregar = CarregarPDF()
-# carregar.carregaholerite()
+carregar = CarregarPdf()  
+carregar.carregaholerite()
 carregar.split_pdf()
 
